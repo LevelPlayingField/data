@@ -27,13 +27,14 @@ def validate_file_headers(*books: typing.List[xlrd.Book], unique_on=None):
         header = [r.value for r in sheet.row(0)]
 
         mismatches = []
-        for cell_a, cell_b in zip(known_header, header):
+        for cell_a, cell_b in zip(sorted(known_header), sorted(header)):
             if cell_a != cell_b:
                 mismatches.append((cell_a, cell_b))
 
         if mismatches:
             validated = False
             print(f"Mismatched headers in {book}")
+            import pdb; pdb.set_trace()
             print(mismatches)
 
 
@@ -83,6 +84,9 @@ def merge_excel_files(*books, output=None, unique_on: typing.List[str] = None):
 
 
 open_workbook = functools.partial(xlrd.open_workbook, on_demand=True)
+def open_workbook(filename):
+    print(filename)
+    return xlrd.open_workbook(filename, on_demand=True)
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -102,5 +106,5 @@ parser.add_argument(
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    # validate_file_headers(*args.files)
+    validate_file_headers(*args.files)
     merge_excel_files(*args.files, output=args.output, unique_on=args.unique_on)
